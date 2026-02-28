@@ -7,10 +7,10 @@ from langchain.tools import tool
 
 load_dotenv()
 # Створюємо LLM-об'єкт
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.7)
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 
 @tool(
-    "calculator",
+    "colculator",
     description="Calculate math expression ('0123456789+-*/(). ')"
 )
 def safe_calculate(expression: str) -> str:
@@ -54,14 +54,14 @@ embeddings = OpenAIEmbeddings()
 #     docstore=InMemoryDocstore(),
 #     index_to_docstore_id={},
 # )
-vectore = FAISS.from_documents(docs, embeddings)
+vector_stores = FAISS.from_documents(docs, embeddings)
 
 @tool
 def search_faq(query: str) -> str:
     """Питання/відповідь"""
     try:
         # result = vector_store.search(query)
-        result = vector_store.similarity_search(query, k=1)
+        result = vector_stores.similarity_search(query, k=1)
         if not result:
             return "Нічого не знайдено у FAQ"
         return result[0].page_content
@@ -71,7 +71,7 @@ def search_faq(query: str) -> str:
 
 
 @tool
-def weatther_api(city: str) -> str:
+def weather_api(city: str) -> str:
     """Відповідає про погоду. Формат: Назва міста англійською"""
     data = {
         "Kharkiv": "Сонячно, 0..+2°C",
@@ -92,7 +92,7 @@ tools = [safe_calculate, search_faq, weather_api]
 prompt = (
     "You have access to a tool that retrieves context from a blog post. "
     "Use the tool to help answer user queries."
-    "Ти корисний асистент. Коли треба рахувати - використовуй 'cflculator'. "
+    "Ти корисний асистент. Коли треба рахувати - використовуй 'calculator'. "
     "Про магазин - шукай у 'faq_search'. А погоду - 'weather_api'. "
     "Спершу зрозумій запит, потім виріши, який інтсрумент доречний"
 )
@@ -111,9 +111,9 @@ def get_output(result: dict) -> str:
         if content and not tool_calls:
             if isinstance(content, str):
                 return content
-            if isinstnce(content, list):
+            if isinstance(content, list):
                 return "".join(
-                    c.get("text", str(c)) if is isinstance(c, dict) else str(c) for c in content
+                    c.get("text", str(c)) if isinstance(c, dict) else str(c) for c in content
                     # for c in content:
                     #     if isinstance(c, dict):
                     #         c.get("text", str(c))
