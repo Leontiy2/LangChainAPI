@@ -39,7 +39,7 @@ def safe_calculate(expression: str) -> str:
 #     n = "qwerty"  # func() -> n = "qwerty"
 #-------------------------------------------------
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.vectorstore import FAISS
+from langchain_community.vectorstores import FAISS
 
 with open("data/faq.txt", "r", encoding="utf-8") as f:
     faq_text = f.read()
